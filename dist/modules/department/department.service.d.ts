@@ -1,0 +1,35 @@
+import { DataSource } from 'typeorm';
+import { IDepartmentRepository } from './interfaces/department.repository.interface';
+import { CreateDepartmentDto } from './dto/commands/create-department.dto';
+import { UpdateDepartmentDto } from './dto/commands/update-department.dto';
+import { BaseService } from '../../common/services/base.service';
+import { CurrentUserContextService } from '../../common/services/current-user-context.service';
+import { GetDepartmentsDto, GetDepartmentsResult } from './dto/queries/get-departments.dto';
+import { DepartmentResponseDto } from './dto/responses/department-response.dto';
+import { SearchDepartmentsDto } from './dto/queries/search-departments.dto';
+import { CurrentUser } from '../../common/interfaces/current-user.interface';
+import { DataLoaderService } from '../../shared/dataloaders/dataloader.service';
+export declare class DepartmentService extends BaseService {
+    private readonly departmentRepository;
+    protected readonly dataSource: DataSource;
+    protected readonly currentUserContext: CurrentUserContextService;
+    private readonly dataLoaderService;
+    constructor(departmentRepository: IDepartmentRepository, dataSource: DataSource, currentUserContext: CurrentUserContextService, dataLoaderService: DataLoaderService);
+    createDepartment(createDto: CreateDepartmentDto, currentUser: CurrentUser): Promise<string>;
+    updateDepartment(id: string, updateDto: UpdateDepartmentDto, currentUser: CurrentUser): Promise<void>;
+    deleteDepartment(id: string, hardDelete?: boolean): Promise<void>;
+    getDepartmentById(id: string): Promise<DepartmentResponseDto>;
+    getDepartments(query: GetDepartmentsDto): Promise<GetDepartmentsResult>;
+    searchDepartments(query: SearchDepartmentsDto): Promise<GetDepartmentsResult>;
+    getDepartmentsByBranch(branchId: string): Promise<DepartmentResponseDto[]>;
+    getDepartmentsByType(departmentTypeId: string): Promise<DepartmentResponseDto[]>;
+    getDepartmentHierarchy(): Promise<DepartmentResponseDto[]>;
+    getDepartmentChildren(parentId: string): Promise<DepartmentResponseDto[]>;
+    getDepartmentsWithStats(query: GetDepartmentsDto): Promise<GetDepartmentsResult>;
+    getStatsOverview(): Promise<any>;
+    getStatsByBranch(branchId: string): Promise<any>;
+    getStatsByType(departmentTypeId: string): Promise<any>;
+    reorderDepartments(departmentIds: string[]): Promise<void>;
+    validateHierarchy(departmentId: string, parentId: string): Promise<boolean>;
+    private mapToResponseDto;
+}

@@ -1,0 +1,50 @@
+import DataLoader from 'dataloader';
+import { User } from '../../modules/user/entities/user.entity';
+import { Province } from '../../modules/province/entities/province.entity';
+import { Ward } from '../../modules/ward/entities/ward.entity';
+import { Branch } from '../../modules/branch/entities/branch.entity';
+import { Department } from '../../modules/department/entities/department.entity';
+import { RoomGroup } from '../../modules/room-group/entities/room-group.entity';
+import { IUserRepository } from '../../modules/user/interfaces/user.repository.interface';
+import { IProvinceRepository } from '../../modules/province/interfaces/province.repository.interface';
+import { IWardRepository } from '../../modules/ward/interfaces/ward.repository.interface';
+import { IBranchRepository } from '../../modules/branch/interfaces/branch.repository.interface';
+import { IDepartmentRepository } from '../../modules/department/interfaces/department.repository.interface';
+import { IRoomGroupRepository } from '../../modules/room-group/interfaces/room-group.repository.interface';
+export interface DataLoaders {
+    userLoader: DataLoader<string, User>;
+    provinceLoader: DataLoader<string, Province>;
+    wardLoader: DataLoader<string, Ward>;
+    branchLoader: DataLoader<string, Branch>;
+    departmentLoader: DataLoader<string, Department>;
+    roomGroupLoader: DataLoader<string, RoomGroup>;
+    wardsByProvinceLoader: DataLoader<string, Ward[]>;
+    branchesByProvinceLoader: DataLoader<string, Branch[]>;
+    branchesByWardLoader: DataLoader<string, Branch[]>;
+    departmentsByBranchLoader: DataLoader<string, Department[]>;
+    departmentsByTypeLoader: DataLoader<string, Department[]>;
+    departmentsByParentLoader: DataLoader<string, Department[]>;
+}
+export declare class DataLoaderService {
+    private readonly userRepository;
+    private readonly provinceRepository;
+    private readonly wardRepository;
+    private readonly branchRepository;
+    private readonly departmentRepository;
+    private readonly roomGroupRepository;
+    constructor(userRepository: IUserRepository, provinceRepository: IProvinceRepository, wardRepository: IWardRepository, branchRepository: IBranchRepository, departmentRepository: IDepartmentRepository, roomGroupRepository: IRoomGroupRepository);
+    createUserLoader(): DataLoader<string, User>;
+    createProvinceLoader(): DataLoader<string, Province>;
+    createWardLoader(): DataLoader<string, Ward>;
+    createBranchLoader(): DataLoader<string, Branch>;
+    createWardsByProvinceLoader(): DataLoader<string, Ward[]>;
+    createBranchesByProvinceLoader(): DataLoader<string, Branch[]>;
+    createBranchesByWardLoader(): DataLoader<string, Branch[]>;
+    createDepartmentLoader(): DataLoader<string, Department>;
+    createRoomGroupLoader(): DataLoader<string, RoomGroup>;
+    createDepartmentsByBranchLoader(): DataLoader<string, Department[]>;
+    createDepartmentsByTypeLoader(): DataLoader<string, Department[]>;
+    createDepartmentsByParentLoader(): DataLoader<string, Department[]>;
+    createLoaders(): DataLoaders;
+    clearLoaders(loaders: DataLoaders): void;
+}

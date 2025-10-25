@@ -1,0 +1,186 @@
+-- =====================================================
+-- LIS GPB - RUN ALL MIGRATIONS SCRIPT
+-- =====================================================
+-- Description: Script tổng hợp để chạy tất cả migrations
+-- Author: System
+-- Date: 2024-01-15
+-- Version: 1.0
+
+-- =====================================================
+-- SETUP ENVIRONMENT
+-- =====================================================
+
+-- Set session parameters
+ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS';
+ALTER SESSION SET NLS_TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS.FF';
+
+-- =====================================================
+-- CREATE MIGRATION LOG TABLE
+-- =====================================================
+
+CREATE TABLE MIGRATION_LOG (
+    ID VARCHAR2(36) PRIMARY KEY,
+    MIGRATION_NAME VARCHAR2(100) NOT NULL,
+    EXECUTED_AT TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    STATUS VARCHAR2(20) NOT NULL,
+    DESCRIPTION CLOB,
+    EXECUTION_TIME NUMBER,
+    ERROR_MESSAGE CLOB
+);
+
+-- =====================================================
+-- STEP 1: CREATE ALL TABLES
+-- =====================================================
+
+PROMPT 'Step 1: Creating all tables...'
+
+-- Execute table creation script
+@@000_create_all_tables.sql
+
+PROMPT 'Step 1 completed: All tables created successfully'
+
+-- =====================================================
+-- STEP 2: CREATE ADMIN USER AND SAMPLE DATA
+-- =====================================================
+
+PROMPT 'Step 2: Creating admin user and sample data...'
+
+-- Execute admin user creation script
+@@001_create_admin_user.sql
+
+PROMPT 'Step 2 completed: Admin user and sample data created successfully'
+
+-- =====================================================
+-- STEP 2.5: FIX UUID GENERATION
+-- =====================================================
+
+PROMPT 'Step 2.5: Fixing UUID generation...'
+
+-- Execute UUID generation fix script
+@@002_fix_uuid_generation.sql
+
+PROMPT 'Step 2.5 completed: UUID generation fixed successfully'
+
+-- =====================================================
+-- STEP 2.6: CREATE SAMPLE TYPES TABLE
+-- =====================================================
+
+PROMPT 'Step 2.6: Creating sample types table...'
+
+-- Execute sample types creation script
+@@003_create_bml_sample_types_table.sql
+
+PROMPT 'Step 2.6 completed: Sample types table created successfully'
+
+-- =====================================================
+-- STEP 2.7: CREATE SAMPLE RECEPTIONS TABLE
+-- =====================================================
+
+PROMPT 'Step 2.7: Creating sample receptions table...'
+
+-- Execute sample receptions creation script
+@@004_create_bml_sample_receptions_table.sql
+
+PROMPT 'Step 2.7 completed: Sample receptions table created successfully'
+
+-- =====================================================
+-- STEP 3: VERIFY INSTALLATION
+-- =====================================================
+
+PROMPT 'Step 3: Verifying installation...'
+
+-- Check all tables exist
+SELECT 'Tables Created' as CHECK_TYPE, COUNT(*) as COUNT
+FROM USER_TABLES 
+WHERE TABLE_NAME LIKE 'BML_%';
+
+-- Check all indexes exist
+SELECT 'Indexes Created' as CHECK_TYPE, COUNT(*) as COUNT
+FROM USER_INDEXES 
+WHERE TABLE_NAME LIKE 'BML_%';
+
+-- Check all constraints exist
+SELECT 'Constraints Created' as CHECK_TYPE, COUNT(*) as COUNT
+FROM USER_CONSTRAINTS 
+WHERE TABLE_NAME LIKE 'BML_%';
+
+-- Check admin user exists
+SELECT 'Admin User' as CHECK_TYPE, USERNAME, EMAIL, FULL_NAME, IS_ACTIVE
+FROM BML_USERS 
+WHERE USERNAME = 'admin';
+
+-- Check sample data
+SELECT 'Sample Data' as CHECK_TYPE, 
+       (SELECT COUNT(*) FROM BML_PROVINCES) as PROVINCES,
+       (SELECT COUNT(*) FROM BML_WARDS) as WARDS,
+       (SELECT COUNT(*) FROM BML_BRANCHES) as BRANCHES,
+       (SELECT COUNT(*) FROM BML_DEPARTMENT_TYPES) as DEPT_TYPES,
+       (SELECT COUNT(*) FROM BML_DEPARTMENTS) as DEPARTMENTS,
+       (SELECT COUNT(*) FROM BML_ROOM_GROUPS) as ROOM_GROUPS,
+       (SELECT COUNT(*) FROM BML_ROOMS) as ROOMS,
+       (SELECT COUNT(*) FROM BML_SAMPLE_TYPES) as SAMPLE_TYPES,
+       (SELECT COUNT(*) FROM BML_SAMPLE_RECEPTIONS) as SAMPLE_RECEPTIONS
+FROM DUAL;
+
+-- =====================================================
+-- STEP 4: FINAL VERIFICATION
+-- =====================================================
+
+PROMPT 'Step 4: Final verification...'
+
+-- Verify foreign key relationships
+SELECT 'Foreign Keys' as CHECK_TYPE, 
+       CONSTRAINT_NAME, 
+       TABLE_NAME, 
+       R_CONSTRAINT_NAME
+FROM USER_CONSTRAINTS 
+WHERE CONSTRAINT_TYPE = 'R' 
+AND TABLE_NAME LIKE 'BML_%'
+ORDER BY TABLE_NAME, CONSTRAINT_NAME;
+
+-- Verify triggers
+SELECT 'Triggers' as CHECK_TYPE, 
+       TRIGGER_NAME, 
+       TABLE_NAME, 
+       STATUS
+FROM USER_TRIGGERS 
+WHERE TABLE_NAME LIKE 'BML_%'
+ORDER BY TABLE_NAME, TRIGGER_NAME;
+
+-- =====================================================
+-- COMPLETION MESSAGE
+-- =====================================================
+
+PROMPT '====================================================='
+PROMPT 'LIS GPB DATABASE SETUP COMPLETED SUCCESSFULLY!'
+PROMPT '====================================================='
+PROMPT 'Admin User: admin'
+PROMPT 'Password: Admin123!'
+PROMPT 'Email: admin@lisgpb.com'
+PROMPT '====================================================='
+PROMPT 'Tables Created:'
+PROMPT '- BML_USERS (Users)'
+PROMPT '- BML_PROVINCES (Provinces)'
+PROMPT '- BML_WARDS (Wards)'
+PROMPT '- BML_BRANCHES (Branches)'
+PROMPT '- BML_DEPARTMENT_TYPES (Department Types)'
+PROMPT '- BML_DEPARTMENTS (Departments)'
+PROMPT '- BML_ROOM_GROUPS (Room Groups)'
+PROMPT '- BML_ROOMS (Rooms)'
+PROMPT '- BML_SAMPLE_TYPES (Sample Types)'
+PROMPT '- BML_SAMPLE_RECEPTIONS (Sample Receptions)'
+PROMPT '====================================================='
+
+-- Log completion
+INSERT INTO MIGRATION_LOG (ID, MIGRATION_NAME, EXECUTED_AT, STATUS, DESCRIPTION) 
+VALUES (
+    'migration-' || TO_CHAR(SYSTIMESTAMP, 'YYYYMMDDHH24MISS'),
+    'run_all_migrations',
+    CURRENT_TIMESTAMP,
+    'SUCCESS',
+    'All LIS GPB tables, indexes, constraints, triggers, and sample data created successfully'
+);
+
+COMMIT;
+
+PROMPT 'Migration completed successfully!'

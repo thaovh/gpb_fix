@@ -1,0 +1,47 @@
+import { BaseEntity } from '../../../common/entities/base.entity';
+import { Province } from '../../province/entities/province.entity';
+import { Ward } from '../../ward/entities/ward.entity';
+export declare class Branch extends BaseEntity {
+    branchCode: string;
+    branchName: string;
+    shortName: string;
+    provinceId: string;
+    wardId: string;
+    address: string;
+    phoneNumber: string;
+    hospitalLevel: string;
+    representative: string;
+    bhyCode: string;
+    isActive: boolean;
+    province: Province;
+    ward: Ward;
+    departments: any[];
+    getDisplayName(): string;
+    isBranchActive(): boolean;
+    getFullAddress(): string;
+    validateBranchCode(): boolean;
+    validateBranchName(): boolean;
+    validateShortName(): boolean;
+    validatePhoneNumber(): boolean;
+    validateHospitalLevel(): boolean;
+    validateBhyCode(): boolean;
+    toJSON(): {
+        id: string;
+        branchCode: string;
+        branchName: string;
+        shortName: string;
+        provinceId: string;
+        wardId: string;
+        address: string;
+        phoneNumber: string;
+        hospitalLevel: string;
+        representative: string;
+        bhyCode: string;
+        isActive: boolean;
+        createdAt: Date;
+        updatedAt: Date;
+        createdBy: string;
+        updatedBy: string;
+        version: number;
+    };
+}
