@@ -31,6 +31,8 @@ export declare class SampleReceptionService extends BaseService {
     generateCodePreview(generateDto: GenerateCodeDto): Promise<GenerateCodeResponseDto>;
     getTodayReceptions(): Promise<SampleReceptionResponseDto[]>;
     getReceptionsByDateRange(startDate: Date, endDate: Date): Promise<SampleReceptionResponseDto[]>;
+    getCodeGenerationConfig(sampleTypeId: string): Promise<any>;
     private getNextSequenceNumber;
+    private formatDateByResetPeriod;
     private mapReceptionToResponseDto;
 }

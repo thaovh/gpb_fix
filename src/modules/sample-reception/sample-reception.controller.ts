@@ -104,6 +104,17 @@ export class SampleReceptionController {
         return ResponseBuilder.success(result);
     }
 
+    @Get('config/:sampleTypeId')
+    @ApiOperation({
+        summary: 'Lấy cấu hình sinh mã',
+        description: 'Lấy cấu hình sinh mã của loại mẫu cụ thể'
+    })
+    @ApiParam({ name: 'sampleTypeId', description: 'ID của loại mẫu' })
+    async getCodeGenerationConfig(@Param('sampleTypeId') sampleTypeId: string) {
+        const config = await this.sampleReceptionService.getCodeGenerationConfig(sampleTypeId);
+        return ResponseBuilder.success(config);
+    }
+
     @Get(':id')
     @ApiOperation({
         summary: 'Lấy thông tin mã tiếp nhận',

@@ -19,8 +19,23 @@ export class SampleTypeResponseDto {
     @ApiProperty({ description: 'Số thứ tự' })
     sortOrder: number;
 
+    @ApiProperty({ description: 'Tiền tố mã tiếp nhận' })
+    codePrefix: string;
+
+    @ApiProperty({ description: 'Độ rộng phần số' })
+    codeWidth: number;
+
+    @ApiProperty({ description: 'Cho phép mã trùng lặp' })
+    allowDuplicate: boolean;
+
+    @ApiProperty({ description: 'Chu kỳ reset số thứ tự' })
+    resetPeriod: string;
+
     @ApiProperty({ description: 'Tên hiển thị' })
     displayName: string;
+
+    @ApiProperty({ description: 'Thông tin sinh mã' })
+    codeGenerationInfo: string;
 
     @ApiProperty({ description: 'Ngày tạo' })
     createdAt: Date;

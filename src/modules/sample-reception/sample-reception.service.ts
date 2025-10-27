@@ -49,15 +49,23 @@ export class SampleReceptionService extends BaseService {
                 throw AppError.notFound('Sample type not found');
             }
 
-            // 2. Sinh mã tiếp nhận
+            // 2. Sinh mã tiếp nhận với cấu hình từ Sample Type
             const receptionCode = await this.generateReceptionCode(sampleType.typeCode, sampleType.id);
 
-            // 3. Tạo record
+            // 3. Kiểm tra trùng lặp nếu không cho phép
+            if (!sampleType.allowDuplicate) {
+                const existingReception = await this.sampleReceptionRepository.findByReceptionCode(receptionCode);
+                if (existingReception) {
+                    throw AppError.conflict('Reception code already exists');
+                }
+            }
+
+            // 4. Tạo record
             const reception = new SampleReception();
             reception.receptionCode = receptionCode;
             reception.sampleTypeId = sampleType.id;
             reception.receptionDate = new Date();
-            reception.sequenceNumber = await this.getNextSequenceNumber(sampleType.id);
+            reception.sequenceNumber = await this.getNextSequenceNumber(sampleType.id, new Date(), sampleType.resetPeriod);
 
             reception.createdBy = currentUser.id;
             reception.updatedBy = currentUser.id;
@@ -107,34 +115,51 @@ export class SampleReceptionService extends BaseService {
     }
 
     async generateReceptionCode(sampleTypeCode: string, sampleTypeId: string, date?: Date): Promise<string> {
+        // 1. Lấy thông tin Sample Type với các fields mới
+        const sampleType = await this.sampleTypeRepository.findById(sampleTypeId);
+        if (!sampleType) {
+            throw AppError.notFound('Sample type not found');
+        }
+
         const targetDate = date || new Date();
-        const dateStr = targetDate.toISOString().slice(0, 7).replace(/-/g, ''); // YYYYMM
 
-        // Lấy số thứ tự tiếp theo cho tháng này
-        const nextSequence = await this.getNextSequenceNumber(sampleTypeId, targetDate);
+        // 2. Xác định format ngày dựa trên resetPeriod
+        const dateStr = this.formatDateByResetPeriod(targetDate, sampleType.resetPeriod);
 
-        // Format: BLOOD202410.0001
-        return `${sampleTypeCode}${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
+        // 3. Lấy số thứ tự tiếp theo
+        const nextSequence = await this.getNextSequenceNumber(sampleTypeId, targetDate, sampleType.resetPeriod);
+
+        // 4. Tạo mã với format mới: {CODE_PREFIX}{DATE_FORMAT}.{SEQUENCE_NUMBER}
+        const paddedSequence = nextSequence.toString().padStart(sampleType.codeWidth, '0');
+        return `${sampleType.codePrefix}${dateStr}.${paddedSequence}`;
     }
 
     async generateCodePreview(generateDto: GenerateCodeDto): Promise<GenerateCodeResponseDto> {
         const targetDate = generateDto.date ? new Date(generateDto.date) : new Date();
-        const dateStr = targetDate.toISOString().slice(0, 7).replace(/-/g, ''); // YYYYMM
 
-        // Tìm SampleType để lấy sampleTypeId
+        // Tìm SampleType để lấy thông tin cấu hình
         const sampleType = await this.sampleTypeRepository.findByCode(generateDto.sampleTypeCode);
         if (!sampleType) {
             throw AppError.notFound('Sample type not found');
         }
 
-        const nextSequence = await this.getNextSequenceNumber(sampleType.id, targetDate);
-        const receptionCode = `${generateDto.sampleTypeCode}${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
+        // Sử dụng logic mới với cấu hình từ Sample Type
+        const dateStr = this.formatDateByResetPeriod(targetDate, sampleType.resetPeriod);
+        const nextSequence = await this.getNextSequenceNumber(sampleType.id, targetDate, sampleType.resetPeriod);
+        const paddedSequence = nextSequence.toString().padStart(sampleType.codeWidth, '0');
+        const receptionCode = `${sampleType.codePrefix}${dateStr}.${paddedSequence}`;
 
         return {
             receptionCode,
             sampleTypeCode: generateDto.sampleTypeCode,
             date: dateStr,
             nextSequence,
+            codeGenerationConfig: {
+                codePrefix: sampleType.codePrefix,
+                codeWidth: sampleType.codeWidth,
+                allowDuplicate: sampleType.allowDuplicate,
+                resetPeriod: sampleType.resetPeriod,
+            },
         };
     }
 
@@ -148,12 +173,53 @@ export class SampleReceptionService extends BaseService {
         return receptions.map(r => this.mapReceptionToResponseDto(r));
     }
 
+    async getCodeGenerationConfig(sampleTypeId: string): Promise<any> {
+        const sampleType = await this.sampleTypeRepository.findById(sampleTypeId);
+        if (!sampleType) {
+            throw AppError.notFound('Sample type not found');
+        }
+
+        return {
+            sampleTypeId: sampleType.id,
+            sampleTypeCode: sampleType.typeCode,
+            sampleTypeName: sampleType.typeName,
+            codeGenerationConfig: {
+                codePrefix: sampleType.codePrefix,
+                codeWidth: sampleType.codeWidth,
+                allowDuplicate: sampleType.allowDuplicate,
+                resetPeriod: sampleType.resetPeriod,
+            },
+            examples: {
+                daily: this.formatDateByResetPeriod(new Date(), 'DAILY'),
+                monthly: this.formatDateByResetPeriod(new Date(), 'MONTHLY'),
+                yearly: this.formatDateByResetPeriod(new Date(), 'YEARLY'),
+                never: this.formatDateByResetPeriod(new Date(), 'NEVER'),
+            },
+            currentDate: new Date().toISOString(),
+        };
+    }
+
     // ========== PRIVATE METHODS ==========
 
-    private async getNextSequenceNumber(sampleTypeId: string, date?: Date): Promise<number> {
+    private async getNextSequenceNumber(sampleTypeId: string, date?: Date, resetPeriod?: string): Promise<number> {
         const targetDate = date || new Date();
-        // Use repository method that properly handles sequence number generation
-        return await this.sampleReceptionRepository.getNextSequenceNumber(sampleTypeId, targetDate);
+        // Use repository method that properly handles sequence number generation based on reset period
+        return await this.sampleReceptionRepository.getNextSequenceNumber(sampleTypeId, targetDate, resetPeriod);
+    }
+
+    private formatDateByResetPeriod(date: Date, resetPeriod: string): string {
+        switch (resetPeriod) {
+            case 'DAILY':
+                return date.toISOString().slice(0, 10).replace(/-/g, ''); // YYYYMMDD
+            case 'MONTHLY':
+                return date.toISOString().slice(0, 7).replace(/-/g, ''); // YYYYMM
+            case 'YEARLY':
+                return date.toISOString().slice(0, 4); // YYYY
+            case 'NEVER':
+                return ''; // Không có phần ngày
+            default:
+                return date.toISOString().slice(0, 7).replace(/-/g, ''); // Default: YYYYMM
+        }
     }
 
     private mapReceptionToResponseDto(reception: SampleReception): SampleReceptionResponseDto {

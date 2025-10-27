@@ -13,5 +13,6 @@ export declare class SampleReceptionRepository implements ISampleReceptionReposi
     countByDateAndType(sampleTypeCode: string, date: Date): Promise<number>;
     findTodayReceptions(): Promise<SampleReception[]>;
     findByDateRange(startDate: Date, endDate: Date): Promise<SampleReception[]>;
-    getNextSequenceNumber(sampleTypeId: string, date: Date): Promise<number>;
+    getNextSequenceNumber(sampleTypeId: string, date: Date, resetPeriod?: string): Promise<number>;
+    findByReceptionCode(receptionCode: string): Promise<SampleReception | null>;
 }

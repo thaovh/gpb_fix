@@ -50,6 +50,10 @@ let SampleReceptionController = class SampleReceptionController {
         const result = await this.sampleReceptionService.generateCodePreview(query);
         return response_builder_1.ResponseBuilder.success(result);
     }
+    async getCodeGenerationConfig(sampleTypeId) {
+        const config = await this.sampleReceptionService.getCodeGenerationConfig(sampleTypeId);
+        return response_builder_1.ResponseBuilder.success(config);
+    }
     async getSampleReceptionById(id) {
         const reception = await this.sampleReceptionService.getSampleReceptionById(id);
         return response_builder_1.ResponseBuilder.success(reception);
@@ -133,6 +137,18 @@ __decorate([
     __metadata("design:paramtypes", [generate_code_dto_1.GenerateCodeDto]),
     __metadata("design:returntype", Promise)
 ], SampleReceptionController.prototype, "generateCodePreview", null);
+__decorate([
+    (0, common_1.Get)('config/:sampleTypeId'),
+    (0, swagger_1.ApiOperation)({
+        summary: 'Lấy cấu hình sinh mã',
+        description: 'Lấy cấu hình sinh mã của loại mẫu cụ thể'
+    }),
+    (0, swagger_1.ApiParam)({ name: 'sampleTypeId', description: 'ID của loại mẫu' }),
+    __param(0, (0, common_1.Param)('sampleTypeId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SampleReceptionController.prototype, "getCodeGenerationConfig", null);
 __decorate([
     (0, common_1.Get)(':id'),
     (0, swagger_1.ApiOperation)({

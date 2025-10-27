@@ -110,18 +110,61 @@ export class SampleReceptionRepository implements ISampleReceptionRepository {
         });
     }
 
-    async getNextSequenceNumber(sampleTypeId: string, date: Date): Promise<number> {
-        const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-        const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+    async getNextSequenceNumber(sampleTypeId: string, date: Date, resetPeriod?: string): Promise<number> {
+        let whereCondition = '';
+        let parameters: any = { sampleTypeId };
+
+        switch (resetPeriod) {
+            case 'DAILY':
+                const startOfDay = new Date(date);
+                startOfDay.setHours(0, 0, 0, 0);
+                const endOfDay = new Date(date);
+                endOfDay.setHours(23, 59, 59, 999);
+                whereCondition = 'sampleReception.receptionDate BETWEEN :startOfDay AND :endOfDay';
+                parameters = { ...parameters, startOfDay, endOfDay };
+                break;
+            case 'MONTHLY':
+                const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+                const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+                whereCondition = 'sampleReception.receptionDate BETWEEN :startOfMonth AND :endOfMonth';
+                parameters = { ...parameters, startOfMonth, endOfMonth };
+                break;
+            case 'YEARLY':
+                const startOfYear = new Date(date.getFullYear(), 0, 1);
+                const endOfYear = new Date(date.getFullYear(), 11, 31, 23, 59, 59, 999);
+                whereCondition = 'sampleReception.receptionDate BETWEEN :startOfYear AND :endOfYear';
+                parameters = { ...parameters, startOfYear, endOfYear };
+                break;
+            case 'NEVER':
+                whereCondition = '1=1'; // Đếm tất cả records
+                break;
+            default:
+                // Default: MONTHLY
+                const startOfMonthDefault = new Date(date.getFullYear(), date.getMonth(), 1);
+                const endOfMonthDefault = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+                whereCondition = 'sampleReception.receptionDate BETWEEN :startOfMonth AND :endOfMonth';
+                parameters = { ...parameters, startOfMonth: startOfMonthDefault, endOfMonth: endOfMonthDefault };
+                break;
+        }
 
         const result = await this.sampleReceptionRepository
             .createQueryBuilder('sampleReception')
             .select('MAX(sampleReception.sequenceNumber)', 'maxSequence')
             .where('sampleReception.sampleTypeId = :sampleTypeId', { sampleTypeId })
-            .andWhere('sampleReception.receptionDate BETWEEN :startOfMonth AND :endOfMonth', { startOfMonth, endOfMonth })
+            .andWhere(whereCondition, parameters)
             .andWhere('sampleReception.deletedAt IS NULL')
             .getRawOne();
 
         return (result?.maxSequence || 0) + 1;
+    }
+
+    async findByReceptionCode(receptionCode: string): Promise<SampleReception | null> {
+        return this.sampleReceptionRepository.findOne({
+            where: {
+                receptionCode,
+                deletedAt: IsNull(),
+            },
+            relations: ['sampleType'],
+        });
     }
 }

@@ -16,6 +16,9 @@ let SampleType = class SampleType extends base_entity_1.BaseEntity {
     getDisplayName() {
         return `${this.typeCode} - ${this.typeName}`;
     }
+    getCodeGenerationInfo() {
+        return `${this.codePrefix} (${this.codeWidth} digits, ${this.allowDuplicate ? 'duplicate allowed' : 'unique'}, ${this.resetPeriod})`;
+    }
 };
 exports.SampleType = SampleType;
 __decorate([
@@ -38,6 +41,22 @@ __decorate([
     (0, typeorm_1.Column)({ name: 'SORT_ORDER', type: 'number', default: 0 }),
     __metadata("design:type", Number)
 ], SampleType.prototype, "sortOrder", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'CODE_PREFIX', length: 5 }),
+    __metadata("design:type", String)
+], SampleType.prototype, "codePrefix", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'CODE_WIDTH', type: 'number', default: 4 }),
+    __metadata("design:type", Number)
+], SampleType.prototype, "codeWidth", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'ALLOW_DUPLICATE', type: 'number', default: 0 }),
+    __metadata("design:type", Boolean)
+], SampleType.prototype, "allowDuplicate", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ name: 'RESET_PERIOD', type: 'varchar2', length: 20, default: 'MONTHLY' }),
+    __metadata("design:type", String)
+], SampleType.prototype, "resetPeriod", void 0);
 exports.SampleType = SampleType = __decorate([
     (0, typeorm_1.Entity)('BML_SAMPLE_TYPES')
 ], SampleType);

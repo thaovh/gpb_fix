@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsNumber, MinLength, MaxLength } from 'class-validator';
+import { IsString, IsOptional, IsNumber, MinLength, MaxLength, IsBoolean, IsIn, Min, Max } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateSampleTypeDto {
@@ -32,4 +32,33 @@ export class UpdateSampleTypeDto {
     @IsNumber()
     @IsOptional()
     sortOrder?: number;
+
+    @ApiPropertyOptional({ description: 'Tiền tố mã tiếp nhận (1-5 ký tự)', example: 'BLOOD' })
+    @IsString()
+    @IsOptional()
+    @MinLength(1)
+    @MaxLength(5)
+    codePrefix?: string;
+
+    @ApiPropertyOptional({ description: 'Độ rộng phần số (1-5)', example: 4 })
+    @IsNumber()
+    @IsOptional()
+    @Min(1)
+    @Max(5)
+    codeWidth?: number;
+
+    @ApiPropertyOptional({ description: 'Cho phép mã trùng lặp', example: false })
+    @IsBoolean()
+    @IsOptional()
+    allowDuplicate?: boolean;
+
+    @ApiPropertyOptional({
+        description: 'Chu kỳ reset số thứ tự',
+        example: 'MONTHLY',
+        enum: ['DAILY', 'MONTHLY', 'YEARLY', 'NEVER']
+    })
+    @IsString()
+    @IsOptional()
+    @IsIn(['DAILY', 'MONTHLY', 'YEARLY', 'NEVER'])
+    resetPeriod?: 'DAILY' | 'MONTHLY' | 'YEARLY' | 'NEVER';
 }

@@ -39,9 +39,29 @@ __decorate([
     __metadata("design:type", Number)
 ], SampleTypeResponseDto.prototype, "sortOrder", void 0);
 __decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Tiền tố mã tiếp nhận' }),
+    __metadata("design:type", String)
+], SampleTypeResponseDto.prototype, "codePrefix", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Độ rộng phần số' }),
+    __metadata("design:type", Number)
+], SampleTypeResponseDto.prototype, "codeWidth", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Cho phép mã trùng lặp' }),
+    __metadata("design:type", Boolean)
+], SampleTypeResponseDto.prototype, "allowDuplicate", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Chu kỳ reset số thứ tự' }),
+    __metadata("design:type", String)
+], SampleTypeResponseDto.prototype, "resetPeriod", void 0);
+__decorate([
     (0, swagger_1.ApiProperty)({ description: 'Tên hiển thị' }),
     __metadata("design:type", String)
 ], SampleTypeResponseDto.prototype, "displayName", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Thông tin sinh mã' }),
+    __metadata("design:type", String)
+], SampleTypeResponseDto.prototype, "codeGenerationInfo", void 0);
 __decorate([
     (0, swagger_1.ApiProperty)({ description: 'Ngày tạo' }),
     __metadata("design:type", Date)

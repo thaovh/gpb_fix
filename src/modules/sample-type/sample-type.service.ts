@@ -57,6 +57,10 @@ export class SampleTypeService extends BaseService {
             sampleType.shortName = createDto.shortName;
             sampleType.description = createDto.description;
             sampleType.sortOrder = createDto.sortOrder || await this.sampleTypeRepository.getNextSortOrder();
+            sampleType.codePrefix = createDto.codePrefix;
+            sampleType.codeWidth = createDto.codeWidth || 4;
+            sampleType.allowDuplicate = createDto.allowDuplicate || false;
+            sampleType.resetPeriod = createDto.resetPeriod || 'MONTHLY';
 
             sampleType.createdBy = currentUser.id;
             sampleType.updatedBy = currentUser.id;
@@ -162,7 +166,12 @@ export class SampleTypeService extends BaseService {
             shortName: sampleType.shortName,
             description: sampleType.description,
             sortOrder: sampleType.sortOrder,
+            codePrefix: sampleType.codePrefix,
+            codeWidth: sampleType.codeWidth,
+            allowDuplicate: sampleType.allowDuplicate,
+            resetPeriod: sampleType.resetPeriod,
             displayName: sampleType.getDisplayName(),
+            codeGenerationInfo: sampleType.getCodeGenerationInfo(),
             createdAt: sampleType.createdAt,
             updatedAt: sampleType.updatedAt,
             createdBy: sampleType.createdBy,

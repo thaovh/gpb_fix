@@ -45,6 +45,10 @@ let SampleTypeService = class SampleTypeService extends base_service_1.BaseServi
             sampleType.shortName = createDto.shortName;
             sampleType.description = createDto.description;
             sampleType.sortOrder = createDto.sortOrder || await this.sampleTypeRepository.getNextSortOrder();
+            sampleType.codePrefix = createDto.codePrefix;
+            sampleType.codeWidth = createDto.codeWidth || 4;
+            sampleType.allowDuplicate = createDto.allowDuplicate || false;
+            sampleType.resetPeriod = createDto.resetPeriod || 'MONTHLY';
             sampleType.createdBy = currentUser.id;
             sampleType.updatedBy = currentUser.id;
             const savedSampleType = await manager.save(sample_type_entity_1.SampleType, sampleType);
@@ -117,7 +121,12 @@ let SampleTypeService = class SampleTypeService extends base_service_1.BaseServi
             shortName: sampleType.shortName,
             description: sampleType.description,
             sortOrder: sampleType.sortOrder,
+            codePrefix: sampleType.codePrefix,
+            codeWidth: sampleType.codeWidth,
+            allowDuplicate: sampleType.allowDuplicate,
+            resetPeriod: sampleType.resetPeriod,
             displayName: sampleType.getDisplayName(),
+            codeGenerationInfo: sampleType.getCodeGenerationInfo(),
             createdAt: sampleType.createdAt,
             updatedAt: sampleType.updatedAt,
             createdBy: sampleType.createdBy,

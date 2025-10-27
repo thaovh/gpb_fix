@@ -51,4 +51,37 @@ __decorate([
     (0, class_validator_1.IsOptional)(),
     __metadata("design:type", Number)
 ], CreateSampleTypeDto.prototype, "sortOrder", void 0);
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'Tiền tố mã tiếp nhận (1-5 ký tự)', example: 'BLOOD' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MinLength)(1),
+    (0, class_validator_1.MaxLength)(5),
+    __metadata("design:type", String)
+], CreateSampleTypeDto.prototype, "codePrefix", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Độ rộng phần số (1-5)', example: 4 }),
+    (0, class_validator_1.IsNumber)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.Min)(1),
+    (0, class_validator_1.Max)(5),
+    __metadata("design:type", Number)
+], CreateSampleTypeDto.prototype, "codeWidth", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Cho phép mã trùng lặp', example: false }),
+    (0, class_validator_1.IsBoolean)(),
+    (0, class_validator_1.IsOptional)(),
+    __metadata("design:type", Boolean)
+], CreateSampleTypeDto.prototype, "allowDuplicate", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({
+        description: 'Chu kỳ reset số thứ tự',
+        example: 'MONTHLY',
+        enum: ['DAILY', 'MONTHLY', 'YEARLY', 'NEVER']
+    }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsIn)(['DAILY', 'MONTHLY', 'YEARLY', 'NEVER']),
+    __metadata("design:type", String)
+], CreateSampleTypeDto.prototype, "resetPeriod", void 0);
 //# sourceMappingURL=create-sample-type.dto.js.map

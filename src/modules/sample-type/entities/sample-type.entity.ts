@@ -18,8 +18,24 @@ export class SampleType extends BaseEntity {
     @Column({ name: 'SORT_ORDER', type: 'number', default: 0 })
     sortOrder: number;
 
+    @Column({ name: 'CODE_PREFIX', length: 5 })
+    codePrefix: string;
+
+    @Column({ name: 'CODE_WIDTH', type: 'number', default: 4 })
+    codeWidth: number;
+
+    @Column({ name: 'ALLOW_DUPLICATE', type: 'number', default: 0 })
+    allowDuplicate: boolean;
+
+    @Column({ name: 'RESET_PERIOD', type: 'varchar2', length: 20, default: 'MONTHLY' })
+    resetPeriod: 'DAILY' | 'MONTHLY' | 'YEARLY' | 'NEVER';
+
     // Business methods
     getDisplayName(): string {
         return `${this.typeCode} - ${this.typeName}`;
+    }
+
+    getCodeGenerationInfo(): string {
+        return `${this.codePrefix} (${this.codeWidth} digits, ${this.allowDuplicate ? 'duplicate allowed' : 'unique'}, ${this.resetPeriod})`;
     }
 }

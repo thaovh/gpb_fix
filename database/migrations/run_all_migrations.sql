@@ -95,6 +95,28 @@ PROMPT 'Step 2.8: Creating patients table...'
 PROMPT 'Step 2.8 completed: Patients table created successfully'
 
 -- =====================================================
+-- STEP 2.9: ADD CODE GENERATION FIELDS TO SAMPLE TYPES
+-- =====================================================
+
+PROMPT 'Step 2.9: Adding code generation fields to sample types...'
+
+-- Execute code generation fields addition script
+@@006_add_code_generation_fields_to_sample_types.sql
+
+PROMPT 'Step 2.9 completed: Code generation fields added successfully'
+
+-- =====================================================
+-- STEP 2.10: UPDATE SAMPLE RECEPTIONS FOR CODE GENERATION
+-- =====================================================
+
+PROMPT 'Step 2.10: Updating sample receptions for code generation...'
+
+-- Execute sample receptions update script
+@@007_update_sample_receptions_for_code_generation.sql
+
+PROMPT 'Step 2.10 completed: Sample receptions updated for code generation successfully'
+
+-- =====================================================
 -- STEP 3: VERIFY INSTALLATION
 -- =====================================================
 

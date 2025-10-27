@@ -37,11 +37,17 @@ let SampleReceptionService = class SampleReceptionService extends base_service_1
                 throw app_error_1.AppError.notFound('Sample type not found');
             }
             const receptionCode = await this.generateReceptionCode(sampleType.typeCode, sampleType.id);
+            if (!sampleType.allowDuplicate) {
+                const existingReception = await this.sampleReceptionRepository.findByReceptionCode(receptionCode);
+                if (existingReception) {
+                    throw app_error_1.AppError.conflict('Reception code already exists');
+                }
+            }
             const reception = new sample_reception_entity_1.SampleReception();
             reception.receptionCode = receptionCode;
             reception.sampleTypeId = sampleType.id;
             reception.receptionDate = new Date();
-            reception.sequenceNumber = await this.getNextSequenceNumber(sampleType.id);
+            reception.sequenceNumber = await this.getNextSequenceNumber(sampleType.id, new Date(), sampleType.resetPeriod);
             reception.createdBy = currentUser.id;
             reception.updatedBy = currentUser.id;
             const savedReception = await manager.save(sample_reception_entity_1.SampleReception, reception);
@@ -75,25 +81,37 @@ let SampleReceptionService = class SampleReceptionService extends base_service_1
         };
     }
     async generateReceptionCode(sampleTypeCode, sampleTypeId, date) {
+        const sampleType = await this.sampleTypeRepository.findById(sampleTypeId);
+        if (!sampleType) {
+            throw app_error_1.AppError.notFound('Sample type not found');
+        }
         const targetDate = date || new Date();
-        const dateStr = targetDate.toISOString().slice(0, 7).replace(/-/g, '');
-        const nextSequence = await this.getNextSequenceNumber(sampleTypeId, targetDate);
-        return `${sampleTypeCode}${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
+        const dateStr = this.formatDateByResetPeriod(targetDate, sampleType.resetPeriod);
+        const nextSequence = await this.getNextSequenceNumber(sampleTypeId, targetDate, sampleType.resetPeriod);
+        const paddedSequence = nextSequence.toString().padStart(sampleType.codeWidth, '0');
+        return `${sampleType.codePrefix}${dateStr}.${paddedSequence}`;
     }
     async generateCodePreview(generateDto) {
         const targetDate = generateDto.date ? new Date(generateDto.date) : new Date();
-        const dateStr = targetDate.toISOString().slice(0, 7).replace(/-/g, '');
         const sampleType = await this.sampleTypeRepository.findByCode(generateDto.sampleTypeCode);
         if (!sampleType) {
             throw app_error_1.AppError.notFound('Sample type not found');
         }
-        const nextSequence = await this.getNextSequenceNumber(sampleType.id, targetDate);
-        const receptionCode = `${generateDto.sampleTypeCode}${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
+        const dateStr = this.formatDateByResetPeriod(targetDate, sampleType.resetPeriod);
+        const nextSequence = await this.getNextSequenceNumber(sampleType.id, targetDate, sampleType.resetPeriod);
+        const paddedSequence = nextSequence.toString().padStart(sampleType.codeWidth, '0');
+        const receptionCode = `${sampleType.codePrefix}${dateStr}.${paddedSequence}`;
         return {
             receptionCode,
             sampleTypeCode: generateDto.sampleTypeCode,
             date: dateStr,
             nextSequence,
+            codeGenerationConfig: {
+                codePrefix: sampleType.codePrefix,
+                codeWidth: sampleType.codeWidth,
+                allowDuplicate: sampleType.allowDuplicate,
+                resetPeriod: sampleType.resetPeriod,
+            },
         };
     }
     async getTodayReceptions() {
@@ -104,9 +122,47 @@ let SampleReceptionService = class SampleReceptionService extends base_service_1
         const receptions = await this.sampleReceptionRepository.findByDateRange(startDate, endDate);
         return receptions.map(r => this.mapReceptionToResponseDto(r));
     }
-    async getNextSequenceNumber(sampleTypeId, date) {
+    async getCodeGenerationConfig(sampleTypeId) {
+        const sampleType = await this.sampleTypeRepository.findById(sampleTypeId);
+        if (!sampleType) {
+            throw app_error_1.AppError.notFound('Sample type not found');
+        }
+        return {
+            sampleTypeId: sampleType.id,
+            sampleTypeCode: sampleType.typeCode,
+            sampleTypeName: sampleType.typeName,
+            codeGenerationConfig: {
+                codePrefix: sampleType.codePrefix,
+                codeWidth: sampleType.codeWidth,
+                allowDuplicate: sampleType.allowDuplicate,
+                resetPeriod: sampleType.resetPeriod,
+            },
+            examples: {
+                daily: this.formatDateByResetPeriod(new Date(), 'DAILY'),
+                monthly: this.formatDateByResetPeriod(new Date(), 'MONTHLY'),
+                yearly: this.formatDateByResetPeriod(new Date(), 'YEARLY'),
+                never: this.formatDateByResetPeriod(new Date(), 'NEVER'),
+            },
+            currentDate: new Date().toISOString(),
+        };
+    }
+    async getNextSequenceNumber(sampleTypeId, date, resetPeriod) {
         const targetDate = date || new Date();
-        return await this.sampleReceptionRepository.getNextSequenceNumber(sampleTypeId, targetDate);
+        return await this.sampleReceptionRepository.getNextSequenceNumber(sampleTypeId, targetDate, resetPeriod);
+    }
+    formatDateByResetPeriod(date, resetPeriod) {
+        switch (resetPeriod) {
+            case 'DAILY':
+                return date.toISOString().slice(0, 10).replace(/-/g, '');
+            case 'MONTHLY':
+                return date.toISOString().slice(0, 7).replace(/-/g, '');
+            case 'YEARLY':
+                return date.toISOString().slice(0, 4);
+            case 'NEVER':
+                return '';
+            default:
+                return date.toISOString().slice(0, 7).replace(/-/g, '');
+        }
     }
     mapReceptionToResponseDto(reception) {
         return {

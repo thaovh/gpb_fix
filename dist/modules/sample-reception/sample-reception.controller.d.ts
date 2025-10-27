@@ -18,5 +18,6 @@ export declare class SampleReceptionController {
     getSampleReceptions(query: GetSampleReceptionsDto): Promise<import("../../common/builders/response.builder").BaseResponse<import("./sample-reception.service").GetSampleReceptionsResult>>;
     getTodayReceptions(): Promise<import("../../common/builders/response.builder").BaseResponse<SampleReceptionResponseDto[]>>;
     generateCodePreview(query: GenerateCodeDto): Promise<import("../../common/builders/response.builder").BaseResponse<GenerateCodeResponseDto>>;
+    getCodeGenerationConfig(sampleTypeId: string): Promise<import("../../common/builders/response.builder").BaseResponse<any>>;
     getSampleReceptionById(id: string): Promise<import("../../common/builders/response.builder").BaseResponse<SampleReceptionResponseDto>>;
 }

@@ -5,7 +5,12 @@ export declare class SampleTypeResponseDto {
     shortName?: string;
     description?: string;
     sortOrder: number;
+    codePrefix: string;
+    codeWidth: number;
+    allowDuplicate: boolean;
+    resetPeriod: string;
     displayName: string;
+    codeGenerationInfo: string;
     createdAt: Date;
     updatedAt: Date;
     createdBy: string;
