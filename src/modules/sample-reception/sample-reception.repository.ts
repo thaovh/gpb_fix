@@ -66,19 +66,16 @@ export class SampleReceptionRepository implements ISampleReceptionRepository {
     }
 
     async countByDateAndType(sampleTypeCode: string, date: Date): Promise<number> {
-        const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0);
-
-        const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+        const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
 
         return this.sampleReceptionRepository
             .createQueryBuilder('reception')
             .leftJoin('reception.sampleType', 'sampleType')
             .where('sampleType.typeCode = :sampleTypeCode', { sampleTypeCode })
             .andWhere('reception.receptionDate BETWEEN :startDate AND :endDate', {
-                startDate: startOfDay,
-                endDate: endOfDay,
+                startDate: startOfMonth,
+                endDate: endOfMonth,
             })
             .andWhere('reception.deletedAt IS NULL')
             .getCount();
@@ -114,16 +111,14 @@ export class SampleReceptionRepository implements ISampleReceptionRepository {
     }
 
     async getNextSequenceNumber(sampleTypeId: string, date: Date): Promise<number> {
-        const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0);
-        const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999);
+        const startOfMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+        const endOfMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
 
         const result = await this.sampleReceptionRepository
             .createQueryBuilder('sampleReception')
             .select('MAX(sampleReception.sequenceNumber)', 'maxSequence')
             .where('sampleReception.sampleTypeId = :sampleTypeId', { sampleTypeId })
-            .andWhere('sampleReception.receptionDate BETWEEN :startOfDay AND :endOfDay', { startOfDay, endOfDay })
+            .andWhere('sampleReception.receptionDate BETWEEN :startOfMonth AND :endOfMonth', { startOfMonth, endOfMonth })
             .andWhere('sampleReception.deletedAt IS NULL')
             .getRawOne();
 

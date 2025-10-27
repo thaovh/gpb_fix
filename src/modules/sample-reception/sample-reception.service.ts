@@ -108,21 +108,27 @@ export class SampleReceptionService extends BaseService {
 
     async generateReceptionCode(sampleTypeCode: string, sampleTypeId: string, date?: Date): Promise<string> {
         const targetDate = date || new Date();
-        const dateStr = targetDate.toISOString().slice(0, 10).replace(/-/g, '');
+        const dateStr = targetDate.toISOString().slice(0, 7).replace(/-/g, ''); // YYYYMM
 
-        // Lấy số thứ tự tiếp theo cho ngày này
+        // Lấy số thứ tự tiếp theo cho tháng này
         const nextSequence = await this.getNextSequenceNumber(sampleTypeId, targetDate);
 
-        // Format: BLOOD.20241024.0001
-        return `${sampleTypeCode}.${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
+        // Format: BLOOD202410.0001
+        return `${sampleTypeCode}${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
     }
 
     async generateCodePreview(generateDto: GenerateCodeDto): Promise<GenerateCodeResponseDto> {
         const targetDate = generateDto.date ? new Date(generateDto.date) : new Date();
-        const dateStr = targetDate.toISOString().slice(0, 10).replace(/-/g, '');
+        const dateStr = targetDate.toISOString().slice(0, 7).replace(/-/g, ''); // YYYYMM
 
-        const nextSequence = await this.getNextSequenceNumber(generateDto.sampleTypeCode, targetDate);
-        const receptionCode = `${generateDto.sampleTypeCode}.${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
+        // Tìm SampleType để lấy sampleTypeId
+        const sampleType = await this.sampleTypeRepository.findByCode(generateDto.sampleTypeCode);
+        if (!sampleType) {
+            throw AppError.notFound('Sample type not found');
+        }
+
+        const nextSequence = await this.getNextSequenceNumber(sampleType.id, targetDate);
+        const receptionCode = `${generateDto.sampleTypeCode}${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
 
         return {
             receptionCode,

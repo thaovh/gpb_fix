@@ -76,15 +76,19 @@ let SampleReceptionService = class SampleReceptionService extends base_service_1
     }
     async generateReceptionCode(sampleTypeCode, sampleTypeId, date) {
         const targetDate = date || new Date();
-        const dateStr = targetDate.toISOString().slice(0, 10).replace(/-/g, '');
+        const dateStr = targetDate.toISOString().slice(0, 7).replace(/-/g, '');
         const nextSequence = await this.getNextSequenceNumber(sampleTypeId, targetDate);
-        return `${sampleTypeCode}.${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
+        return `${sampleTypeCode}${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
     }
     async generateCodePreview(generateDto) {
         const targetDate = generateDto.date ? new Date(generateDto.date) : new Date();
-        const dateStr = targetDate.toISOString().slice(0, 10).replace(/-/g, '');
-        const nextSequence = await this.getNextSequenceNumber(generateDto.sampleTypeCode, targetDate);
-        const receptionCode = `${generateDto.sampleTypeCode}.${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
+        const dateStr = targetDate.toISOString().slice(0, 7).replace(/-/g, '');
+        const sampleType = await this.sampleTypeRepository.findByCode(generateDto.sampleTypeCode);
+        if (!sampleType) {
+            throw app_error_1.AppError.notFound('Sample type not found');
+        }
+        const nextSequence = await this.getNextSequenceNumber(sampleType.id, targetDate);
+        const receptionCode = `${generateDto.sampleTypeCode}${dateStr}.${nextSequence.toString().padStart(4, '0')}`;
         return {
             receptionCode,
             sampleTypeCode: generateDto.sampleTypeCode,

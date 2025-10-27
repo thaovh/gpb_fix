@@ -11,13 +11,14 @@ const common_1 = require("@nestjs/common");
 const password_service_1 = require("./password.service");
 const logger_service_1 = require("./logger.service");
 const trace_service_1 = require("./trace.service");
+const current_user_context_service_1 = require("./current-user-context.service");
 let ServicesModule = class ServicesModule {
 };
 exports.ServicesModule = ServicesModule;
 exports.ServicesModule = ServicesModule = __decorate([
     (0, common_1.Module)({
-        providers: [password_service_1.PasswordService, logger_service_1.AppLoggerService, trace_service_1.TraceService],
-        exports: [password_service_1.PasswordService, logger_service_1.AppLoggerService, trace_service_1.TraceService],
+        providers: [password_service_1.PasswordService, logger_service_1.AppLoggerService, trace_service_1.TraceService, current_user_context_service_1.CurrentUserContextService],
+        exports: [password_service_1.PasswordService, logger_service_1.AppLoggerService, trace_service_1.TraceService, current_user_context_service_1.CurrentUserContextService],
     })
 ], ServicesModule);
 //# sourceMappingURL=services.module.js.map

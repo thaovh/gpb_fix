@@ -25,6 +25,7 @@ const room_group_module_1 = require("./modules/room-group/room-group.module");
 const room_module_1 = require("./modules/room/room.module");
 const sample_type_module_1 = require("./modules/sample-type/sample-type.module");
 const sample_reception_module_1 = require("./modules/sample-reception/sample-reception.module");
+const patient_module_1 = require("./modules/patient/patient.module");
 const health_controller_1 = require("./health.controller");
 const dataloader_module_1 = require("./shared/dataloaders/dataloader.module");
 const services_module_1 = require("./shared/services/services.module");
@@ -54,6 +55,7 @@ exports.AppModule = AppModule = __decorate([
             room_module_1.RoomModule,
             sample_type_module_1.SampleTypeModule,
             sample_reception_module_1.SampleReceptionModule,
+            patient_module_1.PatientModule,
         ],
         controllers: [health_controller_1.HealthController],
         providers: [],

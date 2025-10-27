@@ -84,6 +84,17 @@ PROMPT 'Step 2.7: Creating sample receptions table...'
 PROMPT 'Step 2.7 completed: Sample receptions table created successfully'
 
 -- =====================================================
+-- STEP 2.8: CREATE PATIENTS TABLE
+-- =====================================================
+
+PROMPT 'Step 2.8: Creating patients table...'
+
+-- Execute patients creation script
+@@005_create_bml_patients_table.sql
+
+PROMPT 'Step 2.8 completed: Patients table created successfully'
+
+-- =====================================================
 -- STEP 3: VERIFY INSTALLATION
 -- =====================================================
 
@@ -119,7 +130,8 @@ SELECT 'Sample Data' as CHECK_TYPE,
        (SELECT COUNT(*) FROM BML_ROOM_GROUPS) as ROOM_GROUPS,
        (SELECT COUNT(*) FROM BML_ROOMS) as ROOMS,
        (SELECT COUNT(*) FROM BML_SAMPLE_TYPES) as SAMPLE_TYPES,
-       (SELECT COUNT(*) FROM BML_SAMPLE_RECEPTIONS) as SAMPLE_RECEPTIONS
+       (SELECT COUNT(*) FROM BML_SAMPLE_RECEPTIONS) as SAMPLE_RECEPTIONS,
+       (SELECT COUNT(*) FROM BML_PATIENTS) as PATIENTS
 FROM DUAL;
 
 -- =====================================================
@@ -169,6 +181,7 @@ PROMPT '- BML_ROOM_GROUPS (Room Groups)'
 PROMPT '- BML_ROOMS (Rooms)'
 PROMPT '- BML_SAMPLE_TYPES (Sample Types)'
 PROMPT '- BML_SAMPLE_RECEPTIONS (Sample Receptions)'
+PROMPT '- BML_PATIENTS (Patients)'
 PROMPT '====================================================='
 
 -- Log completion

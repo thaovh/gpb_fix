@@ -20,6 +20,7 @@ import { RoomGroupModule } from './modules/room-group/room-group.module';
 import { RoomModule } from './modules/room/room.module';
 import { SampleTypeModule } from './modules/sample-type/sample-type.module';
 import { SampleReceptionModule } from './modules/sample-reception/sample-reception.module';
+import { PatientModule } from './modules/patient/patient.module';
 import { HealthController } from './health.controller';
 
 // Shared
@@ -59,6 +60,7 @@ import { ServicesModule } from './shared/services/services.module';
         RoomModule,
         SampleTypeModule,
         SampleReceptionModule,
+        PatientModule,
     ],
     controllers: [HealthController],
     providers: [],
