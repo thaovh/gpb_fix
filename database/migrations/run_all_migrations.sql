@@ -117,6 +117,39 @@ PROMPT 'Step 2.10: Updating sample receptions for code generation...'
 PROMPT 'Step 2.10 completed: Sample receptions updated for code generation successfully'
 
 -- =====================================================
+-- STEP 2.11: CREATE SERVICE GROUPS TABLE
+-- =====================================================
+
+PROMPT 'Step 2.11: Creating service groups table...'
+
+-- Execute service groups creation script
+@@008_create_bml_service_groups_table.sql
+
+PROMPT 'Step 2.11 completed: Service groups table created successfully'
+
+-- =====================================================
+-- STEP 2.12: CREATE PROFILES TABLE
+-- =====================================================
+
+PROMPT 'Step 2.12: Creating profiles table...'
+
+-- Execute profiles creation script
+@@009_create_bml_profiles_table.sql
+
+PROMPT 'Step 2.12 completed: Profiles table created successfully'
+
+-- =====================================================
+-- STEP 2.13: CREATE USER ROOMS TABLE
+-- =====================================================
+
+PROMPT 'Step 2.13: Creating user rooms table...'
+
+-- Execute user rooms creation script
+@@010_create_user_rooms_table.sql
+
+PROMPT 'Step 2.13 completed: User rooms table created successfully'
+
+-- =====================================================
 -- STEP 3: VERIFY INSTALLATION
 -- =====================================================
 

@@ -34,6 +34,7 @@ let UserRepository = class UserRepository {
     async findByUsername(username) {
         return this.userRepository.findOne({
             where: { username, deletedAt: (0, typeorm_2.IsNull)() },
+            relations: ['profile'],
         });
     }
     async save(user) {

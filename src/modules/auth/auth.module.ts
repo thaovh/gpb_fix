@@ -1,17 +1,20 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { HttpModule } from '@nestjs/axios';
 import { UserModule } from '../user/user.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { ServicesModule } from '../../shared/services/services.module';
+import { HisIntegrationService } from '../../shared/services/his-integration.service';
 
 @Module({
     imports: [
         UserModule,
         ServicesModule,
         PassportModule,
+        HttpModule,
         JwtModule.register({
             secret: process.env.JWT_SECRET || 'your-super-secret-key-here',
             signOptions: {
@@ -22,7 +25,7 @@ import { ServicesModule } from '../../shared/services/services.module';
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JwtStrategy],
-    exports: [AuthService, JwtStrategy],
+    providers: [AuthService, JwtStrategy, HisIntegrationService],
+    exports: [AuthService, JwtStrategy, HisIntegrationService],
 })
 export class AuthModule { }

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
+import { HttpModule } from '@nestjs/axios';
 
 // Config
 import { databaseConfig } from './config/database.config';
@@ -21,6 +22,9 @@ import { RoomModule } from './modules/room/room.module';
 import { SampleTypeModule } from './modules/sample-type/sample-type.module';
 import { SampleReceptionModule } from './modules/sample-reception/sample-reception.module';
 import { PatientModule } from './modules/patient/patient.module';
+import { ServiceGroupModule } from './modules/service-group/service-group.module';
+import { ProfileModule } from './modules/profile/profile.module';
+import { UserRoomModule } from './modules/user-room/user-room.module';
 import { HealthController } from './health.controller';
 
 // Shared
@@ -44,6 +48,12 @@ import { ServicesModule } from './shared/services/services.module';
         // Passport
         PassportModule.register({ defaultStrategy: 'jwt' }),
 
+        // HTTP
+        HttpModule.register({
+            timeout: 30000,
+            maxRedirects: 5,
+        }),
+
         // Shared modules
         DataLoaderModule,
         ServicesModule,
@@ -61,6 +71,9 @@ import { ServicesModule } from './shared/services/services.module';
         SampleTypeModule,
         SampleReceptionModule,
         PatientModule,
+        ServiceGroupModule,
+        ProfileModule,
+        UserRoomModule,
     ],
     controllers: [HealthController],
     providers: [],

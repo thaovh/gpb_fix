@@ -12,6 +12,7 @@ const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
+const axios_1 = require("@nestjs/axios");
 const database_config_1 = require("./config/database.config");
 const jwt_config_1 = require("./config/jwt.config");
 const user_module_1 = require("./modules/user/user.module");
@@ -26,6 +27,9 @@ const room_module_1 = require("./modules/room/room.module");
 const sample_type_module_1 = require("./modules/sample-type/sample-type.module");
 const sample_reception_module_1 = require("./modules/sample-reception/sample-reception.module");
 const patient_module_1 = require("./modules/patient/patient.module");
+const service_group_module_1 = require("./modules/service-group/service-group.module");
+const profile_module_1 = require("./modules/profile/profile.module");
+const user_room_module_1 = require("./modules/user-room/user-room.module");
 const health_controller_1 = require("./health.controller");
 const dataloader_module_1 = require("./shared/dataloaders/dataloader.module");
 const services_module_1 = require("./shared/services/services.module");
@@ -42,6 +46,10 @@ exports.AppModule = AppModule = __decorate([
             typeorm_1.TypeOrmModule.forRoot(database_config_1.databaseConfig),
             jwt_1.JwtModule.registerAsync(jwt_config_1.jwtConfig),
             passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
+            axios_1.HttpModule.register({
+                timeout: 30000,
+                maxRedirects: 5,
+            }),
             dataloader_module_1.DataLoaderModule,
             services_module_1.ServicesModule,
             user_module_1.UserModule,
@@ -56,6 +64,9 @@ exports.AppModule = AppModule = __decorate([
             sample_type_module_1.SampleTypeModule,
             sample_reception_module_1.SampleReceptionModule,
             patient_module_1.PatientModule,
+            service_group_module_1.ServiceGroupModule,
+            profile_module_1.ProfileModule,
+            user_room_module_1.UserRoomModule,
         ],
         controllers: [health_controller_1.HealthController],
         providers: [],

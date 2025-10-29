@@ -17,12 +17,14 @@ const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const user_entity_1 = require("../user/entities/user.entity");
 const password_service_1 = require("../../shared/services/password.service");
+const his_integration_service_1 = require("../../shared/services/his-integration.service");
 const app_error_1 = require("../../common/errors/app.error");
 let AuthService = class AuthService {
-    constructor(userRepository, jwtService, passwordService) {
+    constructor(userRepository, jwtService, passwordService, hisIntegrationService) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.passwordService = passwordService;
+        this.hisIntegrationService = hisIntegrationService;
     }
     async login(loginDto) {
         const user = await this.userRepository.findByUsername(loginDto.username);
@@ -38,9 +40,42 @@ let AuthService = class AuthService {
         }
         const tokens = await this.generateTokens(user);
         const userResponse = this.mapUserToResponseDto(user);
+        let hisData = null;
+        try {
+            if (user?.profile?.mappedUsername && user?.profile?.mappedPassword) {
+                console.log('Attempting HIS login with credentials:', user.profile.mappedUsername);
+                hisData = await this.hisIntegrationService.loginWithHis(user.profile.mappedUsername, user.profile.mappedPassword);
+                console.log('HIS login successful:', hisData?.Data?.TokenCode);
+            }
+            else {
+                console.log('No HIS credentials found in user profile');
+            }
+        }
+        catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.error('HIS integration failed:', errorMessage);
+        }
         return {
-            ...tokens,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
             user: userResponse,
+            hisTokenCode: hisData?.Data?.TokenCode || null,
+            hisRenewCode: hisData?.Data?.RenewCode || null,
+            hisUserInfo: hisData?.Data?.User ? {
+                loginName: hisData.Data.User.LoginName,
+                userName: hisData.Data.User.UserName,
+                applicationCode: hisData.Data.User.ApplicationCode,
+                gCode: hisData.Data.User.GCode,
+                email: hisData.Data.User.Email,
+                mobile: hisData.Data.User.Mobile,
+            } : null,
+            hisSessionInfo: hisData?.Data ? {
+                validAddress: hisData.Data.ValidAddress,
+                loginTime: hisData.Data.LoginTime,
+                expireTime: hisData.Data.ExpireTime,
+                loginAddress: hisData.Data.LoginAddress,
+            } : null,
+            hisRoles: hisData?.Data?.RoleDatas || null,
         };
     }
     async register(registerDto) {
@@ -149,6 +184,7 @@ exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __param(0, (0, common_1.Inject)('IUserRepository')),
     __metadata("design:paramtypes", [Object, jwt_1.JwtService,
-        password_service_1.PasswordService])
+        password_service_1.PasswordService,
+        his_integration_service_1.HisIntegrationService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

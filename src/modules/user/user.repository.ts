@@ -26,6 +26,7 @@ export class UserRepository implements IUserRepository {
     async findByUsername(username: string): Promise<User | null> {
         return this.userRepository.findOne({
             where: { username, deletedAt: IsNull() },
+            relations: ['profile'],
         });
     }
 

@@ -8,5 +8,8 @@ export declare class User extends BaseEntity {
     phoneNumber?: string;
     dateOfBirth?: Date;
     address?: string;
+    profile?: any;
     isAccountActive(): boolean;
+    hasProfile(): boolean;
+    getProfileData(): any;
 }

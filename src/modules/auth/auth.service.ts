@@ -9,6 +9,7 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileResponseDto } from './dto/profile-response.dto';
 import { PasswordService } from '../../shared/services/password.service';
+import { HisIntegrationService } from '../../shared/services/his-integration.service';
 import { AppError } from '../../common/errors/app.error';
 
 @Injectable()
@@ -18,6 +19,7 @@ export class AuthService {
         private readonly userRepository: IUserRepository,
         private readonly jwtService: JwtService,
         private readonly passwordService: PasswordService,
+        private readonly hisIntegrationService: HisIntegrationService,
     ) { }
 
     async login(loginDto: LoginDto): Promise<AuthResponseDto> {
@@ -38,9 +40,47 @@ export class AuthService {
         const tokens = await this.generateTokens(user);
         const userResponse = this.mapUserToResponseDto(user);
 
+        // Try to get user profile for HIS integration
+        let hisData = null;
+        try {
+            // User already loaded with profile relationship
+            if (user?.profile?.mappedUsername && user?.profile?.mappedPassword) {
+                console.log('Attempting HIS login with credentials:', user.profile.mappedUsername);
+                hisData = await this.hisIntegrationService.loginWithHis(
+                    user.profile.mappedUsername,
+                    user.profile.mappedPassword
+                );
+                console.log('HIS login successful:', hisData?.Data?.TokenCode);
+            } else {
+                console.log('No HIS credentials found in user profile');
+            }
+        } catch (error) {
+            // Log error but don't fail login
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.error('HIS integration failed:', errorMessage);
+        }
+
         return {
-            ...tokens,
+            accessToken: tokens.accessToken,
+            refreshToken: tokens.refreshToken,
             user: userResponse,
+            hisTokenCode: hisData?.Data?.TokenCode || null,
+            hisRenewCode: hisData?.Data?.RenewCode || null,
+            hisUserInfo: hisData?.Data?.User ? {
+                loginName: hisData.Data.User.LoginName,
+                userName: hisData.Data.User.UserName,
+                applicationCode: hisData.Data.User.ApplicationCode,
+                gCode: hisData.Data.User.GCode,
+                email: hisData.Data.User.Email,
+                mobile: hisData.Data.User.Mobile,
+            } : null,
+            hisSessionInfo: hisData?.Data ? {
+                validAddress: hisData.Data.ValidAddress,
+                loginTime: hisData.Data.LoginTime,
+                expireTime: hisData.Data.ExpireTime,
+                loginAddress: hisData.Data.LoginAddress,
+            } : null,
+            hisRoles: hisData?.Data?.RoleDatas || null,
         };
     }
 

@@ -16,6 +16,25 @@ let User = class User extends base_entity_1.BaseEntity {
     isAccountActive() {
         return this.isActive && !this.deletedAt;
     }
+    hasProfile() {
+        return !!this.profile;
+    }
+    getProfileData() {
+        return this.profile ? {
+            provinceId: this.profile.provinceId,
+            wardId: this.profile.wardId,
+            address: this.profile.address,
+            departmentId: this.profile.departmentId,
+            position: this.profile.position,
+            employeeCode: this.profile.employeeCode,
+            phoneNumber: this.profile.phoneNumber,
+            dateOfBirth: this.profile.dateOfBirth,
+            gender: this.profile.gender,
+            avatar: this.profile.avatar,
+            mappedUsername: this.profile.mappedUsername,
+            hasMappedPassword: !!this.profile.mappedPassword,
+        } : null;
+    }
 };
 exports.User = User;
 __decorate([
@@ -50,6 +69,10 @@ __decorate([
     (0, typeorm_1.Column)({ name: 'ADDRESS', type: 'varchar2', length: 2000, nullable: true }),
     __metadata("design:type", String)
 ], User.prototype, "address", void 0);
+__decorate([
+    (0, typeorm_1.OneToOne)('Profile', 'user'),
+    __metadata("design:type", Object)
+], User.prototype, "profile", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)('BML_USERS')
 ], User);

@@ -10,11 +10,13 @@ exports.AuthModule = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const passport_1 = require("@nestjs/passport");
+const axios_1 = require("@nestjs/axios");
 const user_module_1 = require("../user/user.module");
 const auth_service_1 = require("./auth.service");
 const auth_controller_1 = require("./auth.controller");
 const jwt_strategy_1 = require("./strategies/jwt.strategy");
 const services_module_1 = require("../../shared/services/services.module");
+const his_integration_service_1 = require("../../shared/services/his-integration.service");
 let AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule;
@@ -24,6 +26,7 @@ exports.AuthModule = AuthModule = __decorate([
             user_module_1.UserModule,
             services_module_1.ServicesModule,
             passport_1.PassportModule,
+            axios_1.HttpModule,
             jwt_1.JwtModule.register({
                 secret: process.env.JWT_SECRET || 'your-super-secret-key-here',
                 signOptions: {
@@ -34,8 +37,8 @@ exports.AuthModule = AuthModule = __decorate([
             }),
         ],
         controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
-        exports: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy],
+        providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, his_integration_service_1.HisIntegrationService],
+        exports: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, his_integration_service_1.HisIntegrationService],
     })
 ], AuthModule);
 //# sourceMappingURL=auth.module.js.map

@@ -7,11 +7,13 @@ import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { ProfileResponseDto } from './dto/profile-response.dto';
 import { PasswordService } from '../../shared/services/password.service';
+import { HisIntegrationService } from '../../shared/services/his-integration.service';
 export declare class AuthService {
     private readonly userRepository;
     private readonly jwtService;
     private readonly passwordService;
-    constructor(userRepository: IUserRepository, jwtService: JwtService, passwordService: PasswordService);
+    private readonly hisIntegrationService;
+    constructor(userRepository: IUserRepository, jwtService: JwtService, passwordService: PasswordService, hisIntegrationService: HisIntegrationService);
     login(loginDto: LoginDto): Promise<AuthResponseDto>;
     register(registerDto: RegisterDto): Promise<AuthResponseDto>;
     private generateTokens;
