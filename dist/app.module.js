@@ -30,6 +30,7 @@ const patient_module_1 = require("./modules/patient/patient.module");
 const service_group_module_1 = require("./modules/service-group/service-group.module");
 const profile_module_1 = require("./modules/profile/profile.module");
 const user_room_module_1 = require("./modules/user-room/user-room.module");
+const service_module_1 = require("./modules/service/service.module");
 const health_controller_1 = require("./health.controller");
 const dataloader_module_1 = require("./shared/dataloaders/dataloader.module");
 const services_module_1 = require("./shared/services/services.module");
@@ -67,6 +68,7 @@ exports.AppModule = AppModule = __decorate([
             service_group_module_1.ServiceGroupModule,
             profile_module_1.ProfileModule,
             user_room_module_1.UserRoomModule,
+            service_module_1.ServiceModule,
         ],
         controllers: [health_controller_1.HealthController],
         providers: [],

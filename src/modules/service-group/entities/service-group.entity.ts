@@ -1,4 +1,4 @@
-import { Entity, Column, Index } from 'typeorm';
+import { Entity, Column, Index, OneToMany } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 
 @Entity('BML_SERVICE_GROUPS')
@@ -35,9 +35,9 @@ export class ServiceGroup extends BaseEntity {
     @Column({ name: 'COLOR', type: 'varchar2', length: 7, nullable: true })
     color?: string; // Màu sắc cho UI (hex code)
 
-    // One-to-Many relationship with Service (placeholder for future)
-    // @OneToMany('Service', 'serviceGroup')
-    // services: any[];
+    // One-to-Many relationship with Service
+    @OneToMany('Service', 'serviceGroup')
+    services: any[];
 
     // Business methods
     getDisplayName(): string {

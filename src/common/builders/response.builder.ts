@@ -1,3 +1,5 @@
+import { PaginationMeta } from '../dto/pagination-response.dto';
+
 export interface BaseResponse<T = any> {
     success: boolean;
     status_code: number;
@@ -56,6 +58,35 @@ export class ResponseBuilder {
                 ...error,
                 timestamp: new Date().toISOString(),
                 trace_id: traceId || 'unknown',
+            },
+            meta: {
+                timestamp: new Date().toISOString(),
+                ...(requestId && { request_id: requestId }),
+                ...(traceId && { trace_id: traceId }),
+            },
+        };
+    }
+
+    static successWithPagination<T>(
+        data: T[],
+        total: number,
+        limit: number,
+        offset: number,
+        requestId?: string,
+        traceId?: string
+    ): BaseResponse<{ items: T[]; pagination: PaginationMeta }> {
+        return {
+            success: true,
+            status_code: 200,
+            data: {
+                items: data,
+                pagination: {
+                    total,
+                    limit,
+                    offset,
+                    hasNext: offset + limit < total,
+                    hasPrev: offset > 0,
+                },
             },
             meta: {
                 timestamp: new Date().toISOString(),

@@ -25,6 +25,7 @@ import { PatientModule } from './modules/patient/patient.module';
 import { ServiceGroupModule } from './modules/service-group/service-group.module';
 import { ProfileModule } from './modules/profile/profile.module';
 import { UserRoomModule } from './modules/user-room/user-room.module';
+import { ServiceModule } from './modules/service/service.module';
 import { HealthController } from './health.controller';
 
 // Shared
@@ -74,6 +75,7 @@ import { ServicesModule } from './shared/services/services.module';
         ServiceGroupModule,
         ProfileModule,
         UserRoomModule,
+        ServiceModule,
     ],
     controllers: [HealthController],
     providers: [],

@@ -150,6 +150,17 @@ PROMPT 'Step 2.13: Creating user rooms table...'
 PROMPT 'Step 2.13 completed: User rooms table created successfully'
 
 -- =====================================================
+-- STEP 2.14: CREATE SERVICES TABLE
+-- =====================================================
+
+PROMPT 'Step 2.14: Creating services table...'
+
+-- Execute services creation script
+@@012_create_bml_services_table.sql
+
+PROMPT 'Step 2.14 completed: Services table created successfully'
+
+-- =====================================================
 -- STEP 3: VERIFY INSTALLATION
 -- =====================================================
 

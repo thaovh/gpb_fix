@@ -1,3 +1,4 @@
+import { PaginationMeta } from '../dto/pagination-response.dto';
 export interface BaseResponse<T = any> {
     success: boolean;
     status_code: number;
@@ -33,6 +34,10 @@ export interface AppError {
 export declare class ResponseBuilder {
     static success<T>(data: T, statusCode?: number, requestId?: string, traceId?: string): BaseResponse<T>;
     static error(error: AppError, statusCode: number, requestId?: string, traceId?: string): BaseResponse;
+    static successWithPagination<T>(data: T[], total: number, limit: number, offset: number, requestId?: string, traceId?: string): BaseResponse<{
+        items: T[];
+        pagination: PaginationMeta;
+    }>;
     static successWithContext<T>(data: T, statusCode: number, context: {
         requestId?: string;
         traceId?: string;

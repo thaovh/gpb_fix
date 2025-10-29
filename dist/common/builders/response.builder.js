@@ -30,6 +30,27 @@ class ResponseBuilder {
             },
         };
     }
+    static successWithPagination(data, total, limit, offset, requestId, traceId) {
+        return {
+            success: true,
+            status_code: 200,
+            data: {
+                items: data,
+                pagination: {
+                    total,
+                    limit,
+                    offset,
+                    hasNext: offset + limit < total,
+                    hasPrev: offset > 0,
+                },
+            },
+            meta: {
+                timestamp: new Date().toISOString(),
+                ...(requestId && { request_id: requestId }),
+                ...(traceId && { trace_id: traceId }),
+            },
+        };
+    }
     static successWithContext(data, statusCode = 200, context) {
         return this.success(data, statusCode, context.requestId, context.traceId);
     }
