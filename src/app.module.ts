@@ -26,6 +26,8 @@ import { ServiceGroupModule } from './modules/service-group/service-group.module
 import { ProfileModule } from './modules/profile/profile.module';
 import { UserRoomModule } from './modules/user-room/user-room.module';
 import { ServiceModule } from './modules/service/service.module';
+import { ServiceRequestModule } from './modules/service-request/service-request.module';
+import { HisDatabaseModule } from './modules/his-database/his-database.module';
 import { HealthController } from './health.controller';
 
 // Shared
@@ -58,6 +60,7 @@ import { ServicesModule } from './shared/services/services.module';
         // Shared modules
         DataLoaderModule,
         ServicesModule,
+        HisDatabaseModule,
 
         // Feature modules
         UserModule,
@@ -76,6 +79,7 @@ import { ServicesModule } from './shared/services/services.module';
         ProfileModule,
         UserRoomModule,
         ServiceModule,
+        ServiceRequestModule,
     ],
     controllers: [HealthController],
     providers: [],

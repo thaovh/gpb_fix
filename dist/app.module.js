@@ -31,6 +31,8 @@ const service_group_module_1 = require("./modules/service-group/service-group.mo
 const profile_module_1 = require("./modules/profile/profile.module");
 const user_room_module_1 = require("./modules/user-room/user-room.module");
 const service_module_1 = require("./modules/service/service.module");
+const service_request_module_1 = require("./modules/service-request/service-request.module");
+const his_database_module_1 = require("./modules/his-database/his-database.module");
 const health_controller_1 = require("./health.controller");
 const dataloader_module_1 = require("./shared/dataloaders/dataloader.module");
 const services_module_1 = require("./shared/services/services.module");
@@ -53,6 +55,7 @@ exports.AppModule = AppModule = __decorate([
             }),
             dataloader_module_1.DataLoaderModule,
             services_module_1.ServicesModule,
+            his_database_module_1.HisDatabaseModule,
             user_module_1.UserModule,
             auth_module_1.AuthModule,
             province_module_1.ProvinceModule,
@@ -69,6 +72,7 @@ exports.AppModule = AppModule = __decorate([
             profile_module_1.ProfileModule,
             user_room_module_1.UserRoomModule,
             service_module_1.ServiceModule,
+            service_request_module_1.ServiceRequestModule,
         ],
         controllers: [health_controller_1.HealthController],
         providers: [],
