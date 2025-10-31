@@ -28,6 +28,7 @@ import { UserRoomModule } from './modules/user-room/user-room.module';
 import { ServiceModule } from './modules/service/service.module';
 import { ServiceRequestModule } from './modules/service-request/service-request.module';
 import { HisDatabaseModule } from './modules/his-database/his-database.module';
+import { UnitOfMeasureModule } from './modules/unit-of-measure/unit-of-measure.module';
 import { HealthController } from './health.controller';
 
 // Shared
@@ -80,6 +81,7 @@ import { ServicesModule } from './shared/services/services.module';
         UserRoomModule,
         ServiceModule,
         ServiceRequestModule,
+        UnitOfMeasureModule,
     ],
     controllers: [HealthController],
     providers: [],

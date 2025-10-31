@@ -1,6 +1,7 @@
 import { Entity, Column, Index, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { BaseEntity } from '../../../common/entities/base.entity';
 import { ServiceGroup } from '../../service-group/entities/service-group.entity';
+import { UnitOfMeasure } from '../../unit-of-measure/entities/unit-of-measure.entity';
 
 @Entity('BML_SERVICES')
 @Index('IDX_SERVICES_CODE', ['serviceCode'], { unique: true })
@@ -24,10 +25,9 @@ export class Service extends BaseEntity {
     @Column({ name: 'UNIT_OF_MEASURE_ID', type: 'varchar2', length: 36, nullable: true })
     unitOfMeasureId?: string;
 
-    // Placeholder for UnitOfMeasure relationship (to be implemented later)
-    // @ManyToOne(() => UnitOfMeasure)
-    // @JoinColumn({ name: 'UNIT_OF_MEASURE_ID' })
-    // unitOfMeasure?: UnitOfMeasure;
+    @ManyToOne(() => UnitOfMeasure)
+    @JoinColumn({ name: 'UNIT_OF_MEASURE_ID' })
+    unitOfMeasure?: UnitOfMeasure;
 
     @Column({ name: 'MAPPING', type: 'clob', nullable: true })
     mapping?: string;

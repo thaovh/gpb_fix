@@ -161,6 +161,17 @@ PROMPT 'Step 2.14: Creating services table...'
 PROMPT 'Step 2.14 completed: Services table created successfully'
 
 -- =====================================================
+-- STEP 2.15: CREATE UNITS OF MEASURE TABLE
+-- =====================================================
+
+PROMPT 'Step 2.15: Creating units of measure table...'
+
+-- Execute UOM creation script
+@@012_create_bml_units_of_measure.sql
+
+PROMPT 'Step 2.15 completed: Units of measure table created successfully'
+
+-- =====================================================
 -- STEP 3: VERIFY INSTALLATION
 -- =====================================================
 

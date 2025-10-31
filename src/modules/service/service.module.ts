@@ -7,10 +7,11 @@ import { ServiceRepository } from './service.repository';
 import { DataLoaderModule } from '../../shared/dataloaders/dataloader.module';
 import { ServicesModule } from '../../common/services/services.module';
 import { CurrentUserContextService } from '../../common/services/current-user-context.service';
+import { UnitOfMeasure } from '../unit-of-measure/entities/unit-of-measure.entity';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Service]),
+        TypeOrmModule.forFeature([Service, UnitOfMeasure]),
         DataLoaderModule,
         ServicesModule,
     ],
