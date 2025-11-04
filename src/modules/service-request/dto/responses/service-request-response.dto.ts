@@ -137,6 +137,9 @@ export class ServiceTestDto {
     @ApiPropertyOptional({ description: 'ID đơn vị tính', example: '2862cd01-5a13-4404-be5c-2b537c9d0e12' })
     unitOfMeasureId?: string;
 
+    @ApiPropertyOptional({ description: 'Mã đơn vị tính', example: 'UOM_ML' })
+    unitOfMeasureCode?: string;
+
     @ApiPropertyOptional({ description: 'Tên đơn vị tính', example: 'Lan' })
     unitOfMeasureName?: string;
 
@@ -202,6 +205,9 @@ export class LisServiceDto {
     @ApiPropertyOptional({ description: 'ID đơn vị tính', example: '2862cd01-5a13-4404-be5c-2b537c9d0e12' })
     unitOfMeasureId?: string;
 
+    @ApiPropertyOptional({ description: 'Mã đơn vị tính', example: 'UOM_ML' })
+    unitOfMeasureCode?: string;
+
     @ApiPropertyOptional({ description: 'Tên đơn vị tính', example: 'Lan' })
     unitOfMeasureName?: string;
 
@@ -248,6 +254,30 @@ export class ServiceDto {
 
     @ApiPropertyOptional({ description: 'ID dịch vụ trong LIS (UUID) nếu map được theo SERVICE_CODE và là dịch vụ cha (PARENT_SERVICE_ID null), ngược lại null' })
     lisServiceId?: string | null;
+
+    @ApiPropertyOptional({ description: 'ID đơn vị tính', example: 'uuid' })
+    unitOfMeasureId?: string | null;
+
+    @ApiPropertyOptional({ description: 'Mã đơn vị tính', example: 'UOM_ML' })
+    unitOfMeasureCode?: string | null;
+
+    @ApiPropertyOptional({ description: 'Tên đơn vị tính', example: 'Milliliter' })
+    unitOfMeasureName?: string | null;
+
+    @ApiPropertyOptional({ description: 'Khoảng giá trị', example: 'Bình thường: 3.5-5.5 g/dL' })
+    rangeText?: string | null;
+
+    @ApiPropertyOptional({ description: 'Giá trị thấp nhất', example: 3.5 })
+    rangeLow?: number | null;
+
+    @ApiPropertyOptional({ description: 'Giá trị cao nhất', example: 5.5 })
+    rangeHigh?: number | null;
+
+    @ApiPropertyOptional({ description: 'Mapping JSON', example: '{"hisCode": "BM02129", "externalSystem": "LIS"}' })
+    mapping?: string | null;
+
+    @ApiPropertyOptional({ description: 'Thứ tự dịch vụ', example: 1 })
+    testOrder?: number | null;
 
     @ApiPropertyOptional({ description: 'Dịch vụ LIS mapping', type: LisServiceDto })
     lisService?: LisServiceDto;

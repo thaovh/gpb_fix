@@ -12,7 +12,7 @@ import { UnitOfMeasureRepository } from './unit-of-measure.repository';
         UnitOfMeasureService,
         { provide: 'IUnitOfMeasureRepository', useClass: UnitOfMeasureRepository },
     ],
-    exports: [UnitOfMeasureService],
+    exports: [UnitOfMeasureService, 'IUnitOfMeasureRepository'],
 })
 export class UnitOfMeasureModule { }
 

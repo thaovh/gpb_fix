@@ -15,6 +15,7 @@ import { Patient } from '../../patient/entities/patient.entity';
 import { Province } from '../../province/entities/province.entity';
 import { Ward } from '../../ward/entities/ward.entity';
 import { Service as LisService } from '../../service/entities/service.entity';
+import { IUnitOfMeasureRepository } from '../../unit-of-measure/interfaces/unit-of-measure.repository.interface';
 
 @Injectable()
 export class ServiceRequestService {
@@ -35,6 +36,8 @@ export class ServiceRequestService {
         private readonly wardRepo: Repository<Ward>,
         @InjectRepository(LisService)
         private readonly lisServiceRepo: Repository<LisService>,
+        @Inject('IUnitOfMeasureRepository')
+        private readonly unitOfMeasureRepository: IUnitOfMeasureRepository,
     ) { }
 
     async getServiceRequestByCode(query: GetServiceRequestDto): Promise<ServiceRequestResponseDto> {
@@ -127,65 +130,105 @@ export class ServiceRequestService {
         const serviceCodes = Array.from(servicesMap.values()).map(g => g[0].serviceCode);
         const uniqueCodes = Array.from(new Set(serviceCodes)).filter(Boolean);
 
-        let lisParentMap = new Map<string, string>();
+        let lisParentMap = new Map<string, { id: string; unitOfMeasureId: string | null; mapping: string | null; numOrder: number }>();
         if (uniqueCodes.length > 0) {
             const lisParents = await this.lisServiceRepo.find({
                 where: { serviceCode: In(uniqueCodes), parentServiceId: IsNull() },
-                select: ['id', 'serviceCode'],
+                select: ['id', 'serviceCode', 'unitOfMeasureId', 'mapping', 'numOrder'],
             });
-            lisParentMap = new Map(lisParents.map(x => [x.serviceCode, x.id]));
+            lisParentMap = new Map(lisParents.map(x => [x.serviceCode, {
+                id: x.id,
+                unitOfMeasureId: (x as any).unitOfMeasureId ?? null,
+                mapping: (x as any).mapping ?? null,
+                numOrder: (x as any).numOrder ?? 0,
+            }]));
         }
 
         // First pass: compute summary with potential lisServiceId per HIS group
         const serviceSummaries = Array.from(servicesMap.values()).map(group => {
             const first = group[0];
-            const lisServiceId = first.serviceCode ? (lisParentMap.get(first.serviceCode) ?? null) : null;
-            return { first, group, lisServiceId };
+            const lisParentInfo = first.serviceCode ? (lisParentMap.get(first.serviceCode) ?? null) : null;
+            const lisServiceId = lisParentInfo?.id ?? null;
+            const parentUnitOfMeasureId = lisParentInfo?.unitOfMeasureId ?? null;
+            const parentMapping = lisParentInfo?.mapping ?? null;
+            const parentNumOrder = lisParentInfo?.numOrder ?? null;
+            return { first, group, lisServiceId, parentUnitOfMeasureId, parentMapping, parentNumOrder };
         });
 
         // Fetch all LIS children for matched lisServiceIds in one query
         const parentIds = Array.from(new Set(serviceSummaries.map(s => s.lisServiceId).filter((v): v is string => !!v)));
-        let childrenByParent = new Map<string, { id: string; serviceCode: string; serviceName: string; currentPrice: number | null; shortName?: string | null }[]>();
+        let childrenByParent = new Map<string, { id: string; serviceCode: string; serviceName: string; currentPrice: number | null; shortName?: string | null; unitOfMeasureId: string | null }[]>();
         if (parentIds.length > 0) {
             const children = await this.lisServiceRepo.find({
                 where: { parentServiceId: In(parentIds) },
-                select: ['id', 'serviceCode', 'serviceName', 'currentPrice', 'parentServiceId', 'shortName'],
+                select: ['id', 'serviceCode', 'serviceName', 'currentPrice', 'parentServiceId', 'shortName', 'unitOfMeasureId'],
             });
             childrenByParent = children.reduce((acc, c) => {
                 const arr = acc.get(c.parentServiceId as unknown as string) || [];
-                arr.push({ id: c.id, serviceCode: c.serviceCode, serviceName: c.serviceName, currentPrice: (c as any).currentPrice ?? null, shortName: (c as any).shortName ?? null });
+                arr.push({
+                    id: c.id,
+                    serviceCode: c.serviceCode,
+                    serviceName: c.serviceName,
+                    currentPrice: (c as any).currentPrice ?? null,
+                    shortName: (c as any).shortName ?? null,
+                    unitOfMeasureId: (c as any).unitOfMeasureId ?? null,
+                });
                 acc.set(c.parentServiceId as unknown as string, arr);
                 return acc;
             }, new Map<string, any[]>());
         }
 
+        // Collect all unitOfMeasureIds for batch lookup
+        const allUnitOfMeasureIds = new Set<string>();
+        serviceSummaries.forEach(s => {
+            if (s.parentUnitOfMeasureId) {
+                allUnitOfMeasureIds.add(s.parentUnitOfMeasureId);
+            }
+            const lisChildren = s.lisServiceId ? (childrenByParent.get(s.lisServiceId) || []) : [];
+            lisChildren.forEach(ch => {
+                if (ch.unitOfMeasureId) {
+                    allUnitOfMeasureIds.add(ch.unitOfMeasureId);
+                }
+            });
+        });
+
+        // Batch lookup UnitOfMeasure
+        const unitOfMeasures = await this.unitOfMeasureRepository.findByIds(Array.from(allUnitOfMeasureIds));
+        const unitOfMeasureMap = new Map(unitOfMeasures.map(uom => [uom.id, uom]));
+
         // Build final services, preferring LIS children for serviceTests when available
         const services = serviceSummaries.map(s => {
-            const { first, group, lisServiceId } = s;
+            const { first, group, lisServiceId, parentUnitOfMeasureId, parentMapping, parentNumOrder } = s;
             const lisChildren = lisServiceId ? (childrenByParent.get(lisServiceId) || []) : [];
 
+            const parentUom = parentUnitOfMeasureId ? unitOfMeasureMap.get(parentUnitOfMeasureId) : null;
+
             const serviceTests = lisChildren.length > 0
-                ? lisChildren.map(ch => ({
-                    id: ch.id,
-                    testCode: ch.serviceCode,
-                    testName: ch.serviceName,
-                    shortName: ch.shortName ?? undefined,
-                    description: undefined,
-                    unitOfMeasureId: undefined,
-                    unitOfMeasureName: undefined,
-                    rangeText: undefined,
-                    rangeLow: undefined,
-                    rangeHigh: undefined,
-                    mapping: undefined,
-                    testOrder: 0,
-                    price: ch.currentPrice ?? 0,
-                    isActive: 1,
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    createdBy: 'system',
-                    updatedBy: 'system',
-                    version: 1,
-                }))
+                ? lisChildren.map(ch => {
+                    const childUom = ch.unitOfMeasureId ? unitOfMeasureMap.get(ch.unitOfMeasureId) : null;
+                    return {
+                        id: ch.id,
+                        testCode: ch.serviceCode,
+                        testName: ch.serviceName,
+                        shortName: ch.shortName ?? null,
+                        description: null,
+                        unitOfMeasureId: ch.unitOfMeasureId ?? null,
+                        unitOfMeasureCode: childUom?.unitOfMeasureCode ?? null,
+                        unitOfMeasureName: childUom?.unitOfMeasureName ?? null,
+                        rangeText: null,
+                        rangeLow: null,
+                        rangeHigh: null,
+                        mapping: null,
+                        testOrder: 0,
+                        price: ch.currentPrice ?? 0,
+                        isActive: 1,
+                        createdAt: new Date(),
+                        updatedAt: new Date(),
+                        createdBy: 'system',
+                        updatedBy: 'system',
+                        version: 1,
+                    };
+                })
                 : undefined;
 
             const result: any = {
@@ -195,6 +238,14 @@ export class ServiceRequestService {
                 serviceName: first.serviceName,
                 price: first.price,
                 lisServiceId,
+                unitOfMeasureId: parentUnitOfMeasureId ?? null,
+                unitOfMeasureCode: parentUom?.unitOfMeasureCode ?? null,
+                unitOfMeasureName: parentUom?.unitOfMeasureName ?? null,
+                rangeText: null,
+                rangeLow: null,
+                rangeHigh: null,
+                mapping: parentMapping ?? null,
+                testOrder: parentNumOrder ?? null,
             };
             if (serviceTests && serviceTests.length > 0) {
                 result.serviceTests = serviceTests;

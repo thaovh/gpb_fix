@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, ILike } from 'typeorm';
+import { Repository, ILike, In } from 'typeorm';
 import { UnitOfMeasure } from './entities/unit-of-measure.entity';
 import { IUnitOfMeasureRepository } from './interfaces/unit-of-measure.repository.interface';
 import { GetUnitsOfMeasureDto } from './dto/queries/get-units-of-measure.dto';
@@ -14,6 +14,11 @@ export class UnitOfMeasureRepository implements IUnitOfMeasureRepository {
 
     async findById(id: string): Promise<UnitOfMeasure | null> {
         return this.repo.findOne({ where: { id } });
+    }
+
+    async findByIds(ids: string[]): Promise<UnitOfMeasure[]> {
+        if (!ids || ids.length === 0) return [];
+        return this.repo.find({ where: { id: In(ids) } });
     }
 
     async findByCode(code: string): Promise<UnitOfMeasure | null> {

@@ -172,6 +172,28 @@ PROMPT 'Step 2.15: Creating units of measure table...'
 PROMPT 'Step 2.15 completed: Units of measure table created successfully'
 
 -- =====================================================
+-- STEP 2.16: CREATE WORKFLOW STATES TABLE
+-- =====================================================
+
+PROMPT 'Step 2.16: Creating workflow states table...'
+
+-- Execute workflow states creation script
+@@013_create_bml_workflow_states_table.sql
+
+PROMPT 'Step 2.16 completed: Workflow states table created successfully'
+
+-- =====================================================
+-- STEP 2.17: CREATE WORKFLOW HISTORY TABLE (Gộp Module 2+3)
+-- =====================================================
+
+PROMPT 'Step 2.17: Creating workflow history table (gộp current state + history)...'
+
+-- Execute workflow history creation script
+@@014_create_bml_workflow_history_table.sql
+
+PROMPT 'Step 2.17 completed: Workflow history table created successfully'
+
+-- =====================================================
 -- STEP 3: VERIFY INSTALLATION
 -- =====================================================
 

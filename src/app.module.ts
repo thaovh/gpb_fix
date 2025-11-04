@@ -29,6 +29,8 @@ import { ServiceModule } from './modules/service/service.module';
 import { ServiceRequestModule } from './modules/service-request/service-request.module';
 import { HisDatabaseModule } from './modules/his-database/his-database.module';
 import { UnitOfMeasureModule } from './modules/unit-of-measure/unit-of-measure.module';
+import { WorkflowModule } from './modules/workflow/workflow.module';
+import { WorkflowHistoryModule } from './modules/workflow/workflow-history/workflow-history.module';
 import { HealthController } from './health.controller';
 
 // Shared
@@ -82,6 +84,8 @@ import { ServicesModule } from './shared/services/services.module';
         ServiceModule,
         ServiceRequestModule,
         UnitOfMeasureModule,
+        WorkflowModule,
+        WorkflowHistoryModule,
     ],
     controllers: [HealthController],
     providers: [],
